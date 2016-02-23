@@ -1,0 +1,17 @@
+inherits: "oec_template.yaml"
+
+# global:
+#   concat:
+#      type: "merge"
+#      "on": ["yr", "dest_id"]
+#      "how": "outer"
+
+tables:
+  "yd":
+    pk: ["yr", "dest_id"]
+    transform:
+      - type: agg
+        pk: ["yr", "dest_id"]
+        agg:
+          import_val: sum
+          export_val: sum

@@ -1,0 +1,29 @@
+inherits: "oec_template.yaml"
+
+# global:
+#   concat:
+#      type: "merge"
+#      "on": ["yr", "origin_id"]
+#      "how": "outer"
+
+
+
+# global:
+#   transform:
+#     - type: "plugin"
+#       func: "src.plugins.oec.max_finder.get"
+#       column: "hs6"
+#       groupby: [["yr", "origin", "hs6"], ["yr", "origin", "dest"]]
+#       name: ["top_product_<product_len>", "top_dest"]
+#       subset: ["yr", "origin"]
+#       value: "valA"
+
+tables:
+  "yo":
+    pk: ["yr", "origin_id"]
+    transform:
+      - type: agg
+        pk: ["yr", "origin_id"]
+        agg:
+          import_val: sum
+          export_val: sum

@@ -1,0 +1,131 @@
+global:
+  name: "oec"
+  filetype: csv
+
+  type:
+    hs6: str
+    t: int
+    v: float
+    i: str
+    j: str
+  source: "$HOME/Projects/oecdata/data/raw/small.csv"
+  output: "$HOME/Projects/oecdata/data/output/<yr>/<product_len>"
+
+  # concat:
+  #    type: "merge"
+  #    "on": ["yr", "origin_id", "dest_id", "hs6"]
+  #    "how": "outer"
+
+  transform:
+    - source: "$HOME/Projects/oecdata/data/raw/small.csv"
+      type: "join"
+      settings:
+        filetype: csv
+        type:
+          hs6: str
+          t: int
+          v: float
+          i: str
+          j: str
+      rename:
+        i: j
+        j: i
+      left_on: ["t", "i", "j", "hs6"]
+      right_on: ["t", "i", "j", "hs6"]
+      how: outer
+
+    - type: "slice"
+      start: 0
+      length: "<product_len>"
+      column: hs6
+
+    - type: rename
+      value:
+        v_x: "export_val"
+        v_y: "import_val"
+        i: "origin_id"
+        j: "dest_id"
+
+    - type: drop
+      column: ["t", "q_x", "q_y"]
+
+    # - type: join
+    #   source: crosswalks/country.csv
+    #   settings:
+    #     filetype: csv
+    #     usecols: [id, baci_id]
+    #     type:
+    #       baci_id: int
+    #     rename:
+    #       id: origin_id
+    #   left_on: origin
+    #   right_on: baci_id
+    #   how: left
+    #
+    # - type: join
+    #   source: crosswalks/country.csv
+    #   settings:
+    #     filetype: csv
+    #     usecols: [id, baci_id]
+    #     type:
+    #       baci_id: int
+    #     rename:
+    #       id: dest_id
+    #   left_on: dest
+    #   right_on: baci_id
+    #   how: left
+
+    # - type: "plugin"
+    #   func: "src.plugins.oec.max_finder.get"
+    #   column: "hs6"
+    #   name_to_group: {}
+    #   subset: ["yr", "origin"]
+    #   value: "valA"
+    # - type: "agg"
+    #   pk: ["yr", "t", "origin", "hs6"]
+    #   agg: sum
+    # - type: "plugin"
+    #   func: "src.plugins.oec.max_finder.get"
+    #   column: "hs6"
+    #   new_name: "top_product_<product_len>"
+    #   groupby: ["yr", "origin", "hs6"]
+    #   subset: ["yr", "origin"]
+    #   value: "valA"
+
+
+
+  # post_concat:
+  #   - type: drop
+  #     column: ["valA_y", "valB_y"]
+  #   - type: rename
+  #     value:
+  #       valA_x: "export_val"
+  #       valB_x: "import_val"
+
+  source_vars:
+    - name: "yr"
+      values: ["2014"]
+      children:
+        - name: "product_len"
+          values: [6]
+
+# tables:
+#   # "yodp":
+#   #   pk: ["yr", "origin_id", "dest_id", "hs6"]
+#   "yo":
+#     pk: ["yr", "origin_id"]
+#     transform:
+#       - type: agg
+#         pk: ["yr", "origin_id"]
+#         agg:
+#           import_val: sum
+#           export_val: sum
+#
+#   "yd":
+#     pk: ["yr", "dest_id"]
+#     transform:
+#       - type: agg
+#         pk: ["yr", "dest_id"]
+#         agg:
+#           import_val: sum
+#           export_val: sum

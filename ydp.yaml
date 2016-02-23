@@ -1,0 +1,19 @@
+inherits: "oec_template.yaml"
+
+global:
+  source_vars:
+    - name: "yr"
+      values: ["2014"]
+      children:
+        - name: "product_len"
+          values: [4, 6]
+
+tables:
+  "ydp":
+    pk: ["yr", "dest_id", "hs6", "product_len"]
+    transform:
+      - type: agg
+        pk: ["yr", "dest_id", "hs6", "product_len"]
+        agg:
+          import_val: sum
+          export_val: sum

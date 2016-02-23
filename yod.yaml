@@ -1,0 +1,11 @@
+inherits: "oec_template.yaml"
+
+tables:
+  "yod":
+    pk: ["yr", "origin_id", "dest_id"]
+    transform:
+      - type: agg
+        pk: ["yr", "origin_id", "dest_id"]
+        agg:
+          import_val: sum
+          export_val: sum
